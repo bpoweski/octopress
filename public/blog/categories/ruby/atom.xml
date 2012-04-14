@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ruby | Ben Poweski's]]></title>
+  <link href="http://bensblog.com/blog/categories/ruby/atom.xml" rel="self"/>
+  <link href="http://bensblog.com/"/>
+  <updated>2012-04-14T17:05:41-05:00</updated>
+  <id>http://bensblog.com/</id>
+  <author>
+    <name><![CDATA[Ben Poweski]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Apple Push Notifications Toolkit for Ruby]]></title>
+    <link href="http://bensblog.com/blog/2009/09/17/apple-push-notifications-toolkit-for-ruby/"/>
+    <updated>2009-09-17T16:45:00-05:00</updated>
+    <id>http://bensblog.com/blog/2009/09/17/apple-push-notifications-toolkit-for-ruby</id>
+    <content type="html"><![CDATA[<p>Lately I've been working on an iPhone application that utilizes Push Notifications extensively.  While Apple provides great documentation there is still a fair amount of work left up to the developer to send push notification in ordinance to their usage policy.</p>
+
+<p>Since I'm using Rails for the backend I needed a way to maintain a single open SSL connection to prevent setup and tear down for every notification sent.  To accomplish this I created an "Event Machine":http://rubyeventmachine.com/ based server deamon that that proxies all requests send by Rails application over a local, non SSL socket.</p>
+
+<p>The proxy queues and sends each notification to the Apple notification servers.  Additionally I've created a command line script to send notifications for testing purposes.  My project "Apn Server":http://github.com/bpoweski/apnserver/ is hosted on "Github":http://www.github.com/.</p>
+
+<p>You can add it to your Rails application via</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>config.gem "bpoweski-apnserver", :lib => 'apnserver',
+</span><span class='line'>  :source => "http://gems.github.com"</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>You can use either a direct connection to Apple or one through the apnserverd proxy included in the gem.  To configure directly to Apple's server (and also setting up and tearing down a new connection each time).  Add the following to your environment.rb.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ApnServer::Config.pem = '/path/to/pem'
+</span><span class='line'>  ApnServer::Config.host = 'gateway.push.apple.com'
+</span><span class='line'>  ApnServer::Config.port = 2195</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>To use the non SSL apnserverd proxy simply drop the PEM configuration option</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ApnServer::Config.host = 'localhost'
+</span><span class='line'>  ApnServer::Config.port = 22195</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>To send a notification from Ruby</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>notification = ApnServer::Notification.new
+</span><span class='line'>  notification.device_token = Base64.decode64(apns_token)
+</span><span class='line'>  notification.alert = message
+</span><span class='line'>  notification.badge = 1
+</span><span class='line'>  notification.sound = 'default'
+</span><span class='line'>  notification.push</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>You can also send notifications via the line with</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ apnsend --server gateway.push.apple.com --port 2195 \&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code> --pem key.pem \
+</span><span class='line'> --b64-token j92f12jh8lqcAwcOVeSIrsBxibaJ0xyCi8/AkmzNlk8= \
+</span><span class='line'> --sound default \
+</span><span class='line'> --alert Hello
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Securing Data wtih OpenSSL and Ruby: Part One]]></title>
+    <link href="http://bensblog.com/blog/2008/04/28/securing-data-wtih-openssl-and-ruby/"/>
+    <updated>2008-04-28T16:56:00-05:00</updated>
+    <id>http://bensblog.com/blog/2008/04/28/securing-data-wtih-openssl-and-ruby</id>
+    <content type="html"><![CDATA[<p>For the most part Ruby has fantastic APIs.  While there is an occasional wart here and there (I"m speaking to you <a href="http://www.ruby-forum.com/topic/146117">DateTime</a>).  In general, it doesn't suck.  The OpenSSL bindings for Ruby are no exception.</p>
+
+<h2>Bob, meet Alice</h2>
+
+<p>To begin our cultural learnings of OpenSSL and Ruby, let's take a look at source repository for the interpreter. In the <a href="http://svn.ruby-lang.org/cgi-bin/viewvc.cgi/trunk/sample/openssl/">samples</a> directory are some nice examples how the bindings work.  It seems that some of the original code examples were never migrated from the RubyPKI project, but thats ok, you can still access <a href="http://cvs.savannah.gnu.org/viewvc/rubypki/ossl2/examples/">them</a> here.</p>
+
+<h2>The OpenSSL Digest Class</h2>
+
+<p>One of the most common things you'll most likely need is to create a digest of a string of data.  We can do this using by instantiating a Digest class then invoking the hexdigest method.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>irb(main):001:0> require 'openssl'
+</span><span class='line'>=> true
+</span><span class='line'>irb(main):002:0> @sha1 = OpenSSL::Digest::SHA1.new("fooooo")
+</span><span class='line'>=> 58c00efa9bed725721b29f4b5f7864f0f191cad5
+</span><span class='line'>irb(main):003:0> @sha1.hexdigest
+</span><span class='line'>=> "58c00efa9bed725721b29f4b5f7864f0f191cad5"
+</span><span class='line'>irb(main):005:0></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Simple enough.  But what is the deal with 'digest' versus 'openssl/digest'?  According to the 'digest' module is only used for backwards compatibility, so use the openssl version when possible.</p>
+
+<h2>Available Digest Algorithms</h2>
+
+<p>According to the source, the Digest algorithms available are dependent upon the version of OpenSSL compiled with Ruby.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>module OpenSSL
+</span><span class='line'>  class Digest&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>alg = %w(DSS DSS1 MD2 MD4 MD5 MDC2 RIPEMD160 SHA SHA1)
+</span><span class='line'>if OPENSSL_VERSION_NUMBER &gt; 0x00908000
+</span><span class='line'>  alg += %w(SHA224 SHA256 SHA384 SHA512)
+</span><span class='line'>end
+</span><span class='line'>...
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Ben Poweski's Blog</title>
+  <title>Ben Poweski's</title>
   <meta name="author" content="Ben Poweski">
 
   
-  <meta name="description" content="Blog Archives Recent Posts GitHub Repos Status updating&#8230; @bpoweski on GitHub $.domReady(function(){ if (!window.jXHR){ var jxhr = document. &hellip;">
+  <meta name="description" content="Lately I&#8217;ve been working on an iPhone application that utilizes Push Notifications extensively. While Apple provides great documentation there &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -24,7 +24,7 @@
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="/atom.xml" rel="alternate" title="Ben Poweski's Blog" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Ben Poweski's" type="application/atom+xml">
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -35,9 +35,9 @@
 
 <body   >
   <header role="banner"><hgroup>
-  <h1><a href="/">Ben Poweski's Blog</a></h1>
+  <h1><a href="/">Ben Poweski's</a></h1>
   
-    <h2>A blogging framework for hackers.</h2>
+    <h2>Random ramblings</h2>
   
 </hgroup>
 
@@ -65,6 +65,828 @@
       <div class="blog-index">
   
   
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/09/17/apple-push-notifications-toolkit-for-ruby/">Apple Push Notifications Toolkit for Ruby</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-09-17T16:45:00-05:00" pubdate data-updated="true">Sep 17<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Lately I&#8217;ve been working on an iPhone application that utilizes Push Notifications extensively.  While Apple provides great documentation there is still a fair amount of work left up to the developer to send push notification in ordinance to their usage policy.</p>
+<p>Since I&#8217;m using Rails for the backend I needed a way to maintain a single open <span class="caps">SSL</span> connection to prevent setup and tear down for every notification sent.  To accomplish this I created an <a href="http://rubyeventmachine.com/">Event Machine</a> based server deamon that that proxies all requests send by Rails application over a local, non <span class="caps">SSL</span> socket.</p>
+<p>The proxy queues and sends each notification to the Apple notification servers.  Additionally I&#8217;ve created a command line script to send notifications for testing purposes.  My project <a href="http://github.com/bpoweski/apnserver/">Apn Server</a> is hosted on <a href="http://www.github.com/">Github</a>.</p>
+<p>You can add it to your Rails application via</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>config.gem "bpoweski-apnserver", :lib => 'apnserver', 
+</span><span class='line'>  :source => "http://gems.github.com"</span></code></pre></td></tr></table></div></figure></div></notextile></p>
+<p>You can use either a direct connection to Apple or one through the apnserverd proxy included in the gem.  To configure directly to Apple&#8217;s server (and also setting up and tearing down a new connection each time).  Add the following to your environment.rb.</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ApnServer::Config.pem = '/path/to/pem'
+</span><span class='line'>  ApnServer::Config.host = 'gateway.push.apple.com'
+</span><span class='line'>  ApnServer::Config.port = 2195</span></code></pre></td></tr></table></div></figure></div></notextile></p>
+<p>To use the non <span class="caps">SSL</span> apnserverd proxy simply drop the <span class="caps">PEM</span> configuration option</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ApnServer::Config.host = 'localhost'
+</span><span class='line'>  ApnServer::Config.port = 22195</span></code></pre></td></tr></table></div></figure></div></notextile></p>
+<p>To send a notification from Ruby</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>notification = ApnServer::Notification.new
+</span><span class='line'>  notification.device_token = Base64.decode64(apns_token)
+</span><span class='line'>  notification.alert = message
+</span><span class='line'>  notification.badge = 1
+</span><span class='line'>  notification.sound = 'default'
+</span><span class='line'>  notification.push</span></code></pre></td></tr></table></div></figure></div></notextile></p>
+<p>You can also send notifications via the line with</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ apnsend --server gateway.push.apple.com --port 2195 \
+</span><span class='line'>     --pem key.pem \
+</span><span class='line'>     --b64-token j92f12jh8lqcAwcOVeSIrsBxibaJ0xyCi8/AkmzNlk8= \
+</span><span class='line'>     --sound default \
+</span><span class='line'>     --alert Hello</span></code></pre></td></tr></table></div></figure></div></notextile></p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/12/27/remove-bevel-and-gloss-effect-from-iphone-icon/">Remove Bevel and Gloss Effect From iPhone Icon</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-12-27T16:59:00-06:00" pubdate data-updated="true">Dec 27<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>After search for this a bit, it is a simple property inside of your Info.plist.  To remove the bevel and gloss effect set the following property:</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>UIPrerenderedIcon true</span></code></pre></td></tr></table></div></figure></div></notextile></p>
+<p>For more properties check out the [Info.plist reference](http://developer.apple.com/iphone/library/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/ApplicationEnvironment/chapter_3_section_4.html#//apple_ref/doc/uid/TP40007072-CH7-SW15).</p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/05/23/parsing-css-with-antlr/">Parsing CSS With ANTLR</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-05-23T17:01:00-05:00" pubdate data-updated="true">May 23<span>rd</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>For a project I&quot;m working on, we&#8217;ve used <span class="caps">CSS</span> syntax to describe styling on application objects.  To accomplish this we created a parser using Antlr. Here is our implementation of the <span class="caps">CSS</span> core syntax.  Unicode support is left out as it was not needed for our use case, but it should be pretty easy to add in.</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+<span class='line-number'>135</span>
+<span class='line-number'>136</span>
+<span class='line-number'>137</span>
+<span class='line-number'>138</span>
+<span class='line-number'>139</span>
+<span class='line-number'>140</span>
+<span class='line-number'>141</span>
+<span class='line-number'>142</span>
+<span class='line-number'>143</span>
+<span class='line-number'>144</span>
+<span class='line-number'>145</span>
+<span class='line-number'>146</span>
+<span class='line-number'>147</span>
+<span class='line-number'>148</span>
+<span class='line-number'>149</span>
+<span class='line-number'>150</span>
+<span class='line-number'>151</span>
+<span class='line-number'>152</span>
+<span class='line-number'>153</span>
+<span class='line-number'>154</span>
+<span class='line-number'>155</span>
+<span class='line-number'>156</span>
+<span class='line-number'>157</span>
+<span class='line-number'>158</span>
+<span class='line-number'>159</span>
+<span class='line-number'>160</span>
+<span class='line-number'>161</span>
+<span class='line-number'>162</span>
+<span class='line-number'>163</span>
+<span class='line-number'>164</span>
+<span class='line-number'>165</span>
+<span class='line-number'>166</span>
+<span class='line-number'>167</span>
+<span class='line-number'>168</span>
+<span class='line-number'>169</span>
+<span class='line-number'>170</span>
+<span class='line-number'>171</span>
+<span class='line-number'>172</span>
+<span class='line-number'>173</span>
+<span class='line-number'>174</span>
+<span class='line-number'>175</span>
+<span class='line-number'>176</span>
+<span class='line-number'>177</span>
+<span class='line-number'>178</span>
+<span class='line-number'>179</span>
+<span class='line-number'>180</span>
+<span class='line-number'>181</span>
+<span class='line-number'>182</span>
+<span class='line-number'>183</span>
+<span class='line-number'>184</span>
+<span class='line-number'>185</span>
+<span class='line-number'>186</span>
+<span class='line-number'>187</span>
+<span class='line-number'>188</span>
+<span class='line-number'>189</span>
+<span class='line-number'>190</span>
+<span class='line-number'>191</span>
+<span class='line-number'>192</span>
+<span class='line-number'>193</span>
+<span class='line-number'>194</span>
+<span class='line-number'>195</span>
+<span class='line-number'>196</span>
+<span class='line-number'>197</span>
+<span class='line-number'>198</span>
+<span class='line-number'>199</span>
+<span class='line-number'>200</span>
+<span class='line-number'>201</span>
+<span class='line-number'>202</span>
+<span class='line-number'>203</span>
+<span class='line-number'>204</span>
+<span class='line-number'>205</span>
+<span class='line-number'>206</span>
+<span class='line-number'>207</span>
+<span class='line-number'>208</span>
+<span class='line-number'>209</span>
+<span class='line-number'>210</span>
+<span class='line-number'>211</span>
+<span class='line-number'>212</span>
+<span class='line-number'>213</span>
+<span class='line-number'>214</span>
+<span class='line-number'>215</span>
+<span class='line-number'>216</span>
+<span class='line-number'>217</span>
+<span class='line-number'>218</span>
+<span class='line-number'>219</span>
+<span class='line-number'>220</span>
+<span class='line-number'>221</span>
+<span class='line-number'>222</span>
+<span class='line-number'>223</span>
+<span class='line-number'>224</span>
+<span class='line-number'>225</span>
+<span class='line-number'>226</span>
+<span class='line-number'>227</span>
+<span class='line-number'>228</span>
+<span class='line-number'>229</span>
+<span class='line-number'>230</span>
+<span class='line-number'>231</span>
+<span class='line-number'>232</span>
+<span class='line-number'>233</span>
+<span class='line-number'>234</span>
+<span class='line-number'>235</span>
+<span class='line-number'>236</span>
+<span class='line-number'>237</span>
+<span class='line-number'>238</span>
+<span class='line-number'>239</span>
+<span class='line-number'>240</span>
+<span class='line-number'>241</span>
+<span class='line-number'>242</span>
+<span class='line-number'>243</span>
+<span class='line-number'>244</span>
+<span class='line-number'>245</span>
+<span class='line-number'>246</span>
+<span class='line-number'>247</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>grammar CssCore;
+</span><span class='line'>options { language=Java; }
+</span><span class='line'>
+</span><span class='line'>/*
+</span><span class='line'>
+</span><span class='line'>Grammar taken from
+</span><span class='line'>http://www.w3.org/TR/REC-CSS2/syndata.html#tokenization
+</span><span class='line'>
+</span><span class='line'>*/
+</span><span class='line'>
+</span><span class='line'>//stylesheet  : [ CDO | CDC | S | statement ]*;
+</span><span class='line'>stylesheet
+</span><span class='line'>	:	(CDO|CDC|statement)*
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>//statement   : ruleset | at-rule;
+</span><span class='line'>statement
+</span><span class='line'>	:	ruleset
+</span><span class='line'>	|	atRule
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//at-rule     : ATKEYWORD S* any* [ block | ';' S* ];
+</span><span class='line'>atRule	:	ATKEYWORD any* (block | SEMICOLON)
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//block       : '{' S* [ any | block | ATKEYWORD S* | ';' ]* '}' S*;
+</span><span class='line'>block	:	LBRACE (any|block|ATKEYWORD|SEMICOLON)* RBRACE 
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//ruleset     : selector? '{' S* declaration? [ ';' S* declaration? ]* '}' S*;
+</span><span class='line'>
+</span><span class='line'>selector:	'*'
+</span><span class='line'>	|	'*'? (IDENT|'>'|'+'|CLASS|HASH)+
+</span><span class='line'>	;
+</span><span class='line'>	
+</span><span class='line'>	
+</span><span class='line'>ruleset	:	selector? LBRACE declaration? ( SEMICOLON declaration? )* RBRACE
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//selector    : any+;
+</span><span class='line'>
+</span><span class='line'>//declaration : property ':' S* value;
+</span><span class='line'>declaration
+</span><span class='line'>	:	property COLON value
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//property    : IDENT S*;
+</span><span class='line'>property:	IDENT
+</span><span class='line'>	 ;
+</span><span class='line'>
+</span><span class='line'>//value       : [ any | block | ATKEYWORD S* ]+;
+</span><span class='line'>value	:	(any|block|ATKEYWORD)*
+</span><span class='line'>          ;
+</span><span class='line'>
+</span><span class='line'>//any         : [ IDENT | NUMBER | PERCENTAGE | DIMENSION | STRING
+</span><span class='line'>//              | DELIM | URI | HASH | UNICODE-RANGE | INCLUDES
+</span><span class='line'>//              | FUNCTION | DASHMATCH | '(' any* ')' | '[' any* ']' ] S*;
+</span><span class='line'>any	:	(	IDENT|NUMBER|PERCENTAGE|DIMENSION|STRING|
+</span><span class='line'>			HASH|INCLUDES|
+</span><span class='line'>			FUNCTION|DASHMATCH
+</span><span class='line'>			// TODO UNICODE_RANGE|DELIM|URI| '(' any* ')' | '[' any* ']' ] S*;
+</span><span class='line'>		)
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>/* Tokens */
+</span><span class='line'>
+</span><span class='line'>//IDENT 	{ident}
+</span><span class='line'>IDENT	:	F_IDENT
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//ATKEYWORD 	@{ident}
+</span><span class='line'>ATKEYWORD
+</span><span class='line'>	:	'@' F_IDENT
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//STRING 	{string}
+</span><span class='line'>STRING	:	F_STRING
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//HASH 	#{name}
+</span><span class='line'>HASH	:	'#' F_NAME
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//NUMBER 	{num}
+</span><span class='line'>NUMBER	:	F_NUM
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//PERCENTAGE 	{num}%
+</span><span class='line'>PERCENTAGE
+</span><span class='line'>	:	F_NUM '%'
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//DIMENSION 	{num}{ident}
+</span><span class='line'>DIMENSION
+</span><span class='line'>	:	F_NUM F_IDENT
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//URI 	url\({w}{string}{w}\)
+</span><span class='line'>//|url\({w}([!#$%&*-~]|{nonascii}|{escape})*{w}\)
+</span><span class='line'>//UNICODE-RANGE 	U\+[0-9A-F?]{1,6}(-[0-9A-F]{1,6})?
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>//CDO 	&lt;!--
+</span><span class='line'>CDO	:	'&lt;!--'
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//CDC 	-->
+</span><span class='line'>CDC	:	'-->'
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>//; 	;
+</span><span class='line'>SEMICOLON
+</span><span class='line'>	:	';'
+</span><span class='line'>	;	
+</span><span class='line'>	
+</span><span class='line'>COLON	:	':'
+</span><span class='line'>	;	
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>//{ 	\{
+</span><span class='line'>LBRACE	:	'{'
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//} 	\}
+</span><span class='line'>RBRACE	:	'}'
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//( 	\(
+</span><span class='line'>LPAREN	:	'('
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//) 	\)
+</span><span class='line'>RPAREN	:	')'
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//[ 	\[
+</span><span class='line'>LBRACKET:	'['
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//] 	\]
+</span><span class='line'>RBRACKET:	']'
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//S 	[ \t\r\n\f]+
+</span><span class='line'>S	:	(' '|'\t'|'\r'|'\n'|'\f')+
+</span><span class='line'>		{ $channel=HIDDEN; }
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//COMMENT 	\/\*[^*]*\*+([^/][^*]*\*+)*\/
+</span><span class='line'>COMMENT	:	'/*' (options {greedy=false;} : .)*   '*/'
+</span><span class='line'>		{ $channel=HIDDEN; }
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//FUNCTION 	{ident}\(
+</span><span class='line'>FUNCTION:	F_IDENT '('
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//INCLUDES 	~=
+</span><span class='line'>INCLUDES:	'~='
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//DASHMATCH 	|=
+</span><span class='line'>DASHMATCH
+</span><span class='line'>	:	'|='
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//DELIM 	any other character not matched by the above rules
+</span><span class='line'>
+</span><span class='line'>CLASS	:	'.' F_IDENT
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>//ident 	{nmstart}{nmchar}*
+</span><span class='line'>fragment
+</span><span class='line'>F_IDENT	:	F_NMSTART F_NMCHAR*
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//name 	{nmchar}+
+</span><span class='line'>fragment
+</span><span class='line'>F_NAME	:	F_NMCHAR+
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//nmstart 	[a-zA-Z]|{nonascii}|{escape}
+</span><span class='line'>fragment
+</span><span class='line'>F_NMSTART
+</span><span class='line'>	:	(F_LETTER)
+</span><span class='line'>// TODO	add nonascii, escaped
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//nonascii	[^\0-\177]
+</span><span class='line'>//unicode 	\\[0-9a-f]{1,6}[ \n\r\t\f]?
+</span><span class='line'>//escape 	{unicode}|\\[ -~\200-\4177777]
+</span><span class='line'>
+</span><span class='line'>//nmchar 	[a-z0-9-]|{nonascii}|{escape}
+</span><span class='line'>fragment
+</span><span class='line'>F_NMCHAR:	(F_LETTER|F_DIGIT|'-')
+</span><span class='line'>// TODO	add nonascii, escaped
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//num 	[0-9]+|[0-9]*\.[0-9]+
+</span><span class='line'>fragment
+</span><span class='line'>F_NUM	:	('0'..'9')+
+</span><span class='line'>	|	('0'..'9')* '.' ('0'..'9')+
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>//string 	{string1}|{string2}
+</span><span class='line'>fragment
+</span><span class='line'>F_STRING:	F_STRING1
+</span><span class='line'>	|	F_STRING2
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//string1 	\"([\t !#$%&(-~]|\\{nl}|\'|{nonascii}|{escape})*\"
+</span><span class='line'>fragment
+</span><span class='line'>F_STRING1
+</span><span class='line'>	:	'"' ('\t'|' '|'!'|'#'|'$'|'%'|'&'|'\''|'.'|F_LETTER|F_DIGIT)* '"' 
+</span><span class='line'>	;
+</span><span class='line'>//string2 	\'([\t !#$%&(-~]|\\{nl}|\"|{nonascii}|{escape})*\'
+</span><span class='line'>fragment
+</span><span class='line'>F_STRING2
+</span><span class='line'>	:	'\'' ('\t'|' '|'!'|'#'|'$'|'%'|'&'|'.'|F_LETTER|F_DIGIT)* '\'' 
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//nl 	\n|\r\n|\r|\f
+</span><span class='line'>fragment
+</span><span class='line'>F_NL	:	'\n'
+</span><span class='line'>	|	'\r\n'
+</span><span class='line'>	|	'\r'
+</span><span class='line'>	|	'\f'
+</span><span class='line'>	;
+</span><span class='line'>	
+</span><span class='line'>fragment
+</span><span class='line'>F_LETTER:	'a'..'z'
+</span><span class='line'>	|	'A'..'Z'
+</span><span class='line'>	;
+</span><span class='line'>	
+</span><span class='line'>fragment
+</span><span class='line'>F_DIGIT	:	'0'..'9'
+</span><span class='line'>	;
+</span><span class='line'>
+</span><span class='line'>//w 	[ \t\r\n\f]*
+</span><span class='line'>fragment
+</span><span class='line'>F_W	:	(' '|'\t'|'\r'|'\n'|'\f')*
+</span><span class='line'>	;</span></code></pre></td></tr></table></div></figure></div></notextile></p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/04/28/securing-data-wtih-openssl-and-ruby/">Securing Data Wtih OpenSSL and Ruby: Part One</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-04-28T16:56:00-05:00" pubdate data-updated="true">Apr 28<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>For the most part Ruby has fantastic APIs.  While there is an occasional wart here and there (I&quot;m speaking to you [DateTime](http://www.ruby-forum.com/topic/146117)).  In general, it doesn&#8217;t suck.  The OpenSSL bindings for Ruby are no exception.</p>
+
+	<ol>
+		<li>Bob, meet Alice ##</li>
+	</ol><p>To begin our cultural learnings of OpenSSL and Ruby, let&#8217;s take a look at source repository for the interpreter. In the [samples](http://svn.ruby-lang.org/cgi-bin/viewvc.cgi/trunk/sample/openssl/) directory are some nice examples how the bindings work.  It seems that some of the original code examples were never migrated from the RubyPKI project, but thats ok, you can still access [them](http://cvs.savannah.gnu.org/viewvc/rubypki/ossl2/examples/) here.</p>
+
+	<ol>
+		<li>The OpenSSL Digest Class ##</li>
+	</ol><p>One of the most common things you&#8217;ll most likely need is to create a digest of a string of data.  We can do this using by instantiating a Digest class then invoking the hexdigest method.</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>irb(main):001:0> require 'openssl'
+</span><span class='line'>=> true
+</span><span class='line'>irb(main):002:0> @sha1 = OpenSSL::Digest::SHA1.new("fooooo")
+</span><span class='line'>=> 58c00efa9bed725721b29f4b5f7864f0f191cad5
+</span><span class='line'>irb(main):003:0> @sha1.hexdigest
+</span><span class='line'>=> "58c00efa9bed725721b29f4b5f7864f0f191cad5"
+</span><span class='line'>irb(main):005:0></span></code></pre></td></tr></table></div></figure></div></notextile></p>
+<p>Simple enough.  But what is the deal with &#8216;digest&#8217; versus &#8216;openssl/digest&#8217;?  According to the &#8216;digest&#8217; module is only used for backwards compatibility, so use the openssl version when possible.</p>
+
+	<ol>
+		<li>Available Digest Algorithms ##</li>
+	</ol><p>According to the source, the Digest algorithms available are dependent upon the version of OpenSSL compiled with Ruby.</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>module OpenSSL
+</span><span class='line'>  class Digest
+</span><span class='line'>
+</span><span class='line'>    alg = %w(DSS DSS1 MD2 MD4 MD5 MDC2 RIPEMD160 SHA SHA1)
+</span><span class='line'>    if OPENSSL_VERSION_NUMBER > 0x00908000
+</span><span class='line'>      alg += %w(SHA224 SHA256 SHA384 SHA512)
+</span><span class='line'>    end
+</span><span class='line'>    ...</span></code></pre></td></tr></table></div></figure></div></notextile></p></div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/02/22/compiling-erlang-applications-with-rake/">Compiling Erlang Applications With Rake</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2008-02-22T17:03:00-06:00" pubdate data-updated="true">Feb 22<span>nd</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>The irony of Rake is that Ruby really doesn’t need it. This is not to say it isn’t useful to Ruby projects, quite the contrary. Where Rake shines is in building software for applications that require byte code and object code, such as Java or C centric projects.</p>
+<p>One such language requiring byte code compilation is <a href="http://www.erlang.org/">Erlang</a>. The design of the runtime environment used by Erlang should be familiar to most Java or C# developers. Erlang uses a byte code compiler (erlc) and various application meta-data files (.app, .rel, .config). For my development work I use Erlide, the Eclipse based Erlang <span class="caps">IDE</span>. The standard project layout for an application created in <a href="http://erlide.sourceforge.net/">Erlide</a> is:</p>
+<p>+ project<br />
+  &#8211; ebin<br />
+  &#8211; include<br />
+  &#8211; src</p>
+<p>When creating a Rake file for Erlang projects, I ran into a few problems with compiling the source into the separate ebin directory. Namely, dependencies where not being constructed as desired yielding a full rebuild every time I ran the build script! In the following example I dynamically create the file rules so that the bytecode (.beam) files will only be recompiled if the source (.erl) file is changed.</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>require 'rake'
+</span><span class='line'>require 'rake/clean'
+</span><span class='line'>
+</span><span class='line'>CLEAN.include(['ebin/*.beam', '*.dump'])
+</span><span class='line'>SRC = FileList['src/**/*.erl']
+</span><span class='line'>BEAM = []
+</span><span class='line'>
+</span><span class='line'>SRC.each do |fn|
+</span><span class='line'>  BEAM &lt;&lt; dest = File.join('ebin', File.basename(fn).ext('beam'))
+</span><span class='line'>  file dest do
+</span><span class='line'>    sh "erlc -o ebin #{fn}" 
+</span><span class='line'>  end
+</span><span class='line'>end
+</span><span class='line'>
+</span><span class='line'>namespace :erlang do
+</span><span class='line'>  desc "staring ermail" 
+</span><span class='line'>    task :run => [:compile] do
+</span><span class='line'>      sh("erl -noshell -pa ebin -s my_mod start")
+</span><span class='line'>    end
+</span><span class='line'>
+</span><span class='line'>  desc "run tests" 
+</span><span class='line'>  task :test => BEAM do
+</span><span class='line'>    sh("erl -noshell -s test_my_mod test -s init stop")
+</span><span class='line'>  end
+</span><span class='line'>end
+</span><span class='line'>
+</span><span class='line'>task :default => [:compile]
+</span><span class='line'>task :start => ['erlang:run']
+</span><span class='line'>task :compile => BEAM</span></code></pre></td></tr></table></div></figure></div></notextile></p></div>
+  
+  
+
+
+    </article>
+  
   <div class="pagination">
     
     <a href="/blog/archives">Blog Archives</a>
@@ -76,6 +898,26 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2009/09/17/apple-push-notifications-toolkit-for-ruby/">Apple Push Notifications Toolkit for Ruby</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2008/12/27/remove-bevel-and-gloss-effect-from-iphone-icon/">Remove Bevel and Gloss Effect From iPhone Icon</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2008/05/23/parsing-css-with-antlr/">Parsing CSS with ANTLR</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2008/04/28/securing-data-wtih-openssl-and-ruby/">Securing Data wtih OpenSSL and Ruby: Part One</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2008/02/22/compiling-erlang-applications-with-rake/">Compiling Erlang Applications with Rake</a>
+      </li>
     
   </ul>
 </section>
