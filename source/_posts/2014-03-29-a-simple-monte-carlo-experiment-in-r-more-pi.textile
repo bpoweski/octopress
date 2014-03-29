@@ -1,0 +1,53 @@
+---
+layout: post
+title: "A Simple Monte Carlo Experiment in R: More Pi"
+date: 2014-03-29 17:03
+comments: true
+categories:
+---
+
+Monte Carlo simulations (or Monte Carlo methods) are a simple but useful technique to derive a solution to a problem by randomly guessing possible inputs.  The definition is so broad that it's likely you've used this technique without even realizing it.
+
+The hello world problem for Monte Carlo applications is undoubtedly calculating approximations of Pi, albeit ineffeciently.
+
+h3. It's Always About Darts
+
+Before we can write software to do this we need to think about how to restate the question in probablistic terms.  A way to model this problem is to think about Pi as the probability of hitting 1/4 of a perfectly circular dartboard inside of a square.
+
+{% codeblock %}
+library("ggplot2")
+
+set.seed(13)
+
+make.pi <- function(n) {
+    darts <- data.frame(x=runif(n), y=runif(n))
+    darts$hit <- (darts$x^2 + darts$y^2) <= 1
+    darts
+}
+
+calc.pi <- function(df) {
+    4*sum(df$hit)/nrow(df)
+}
+{% endcodeblock %}
+
+Here we have the make.pi function that creates an R data.frame that holds the trials containing the X & Y coordinates of the dart position.
+
+{% codeblock %}
+sim <- make.pi(10000)
+ggplot(sim, aes(x, y, color=hit)) + geom_point() + ggtitle(calc.pi(sim))
+{% endcodeblock %}
+
+This plot gives us a visualization of where each trial lands.
+
+{% img /images/quarter_circle.png %}
+
+{% codeblock %}
+attempts <- seq(1000, 1000000, by=10000)
+estimated <- sapply(attempts, function(x) calc.pi(make.pi(x)))
+
+ggplot(data.frame(estimated=estimated, n=attempts)) + geom_line(aes(x=n, y=estimated)) + geom_hline(yintercept=pi, color="green")
+{% endcodeblock %}
+
+And finally we can check how well this solution scales with different size trials.
+
+{% img /images/error.png %}
