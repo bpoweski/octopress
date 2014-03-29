@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Apple Push Notifications Toolkit for Ruby - Ben Poweski</title>
+  <title>A Simple Monte Carlo Experiment in R: More Pi - Ben Poweski</title>
   <meta name="author" content="Ben Poweski">
 
   
-  <meta name="description" content="Lately I&#8217;ve been working on an iPhone application that utilizes Push Notifications extensively. While Apple provides great documentation there &hellip;">
+  <meta name="description" content="Monte Carlo simulations (or Monte Carlo methods) are a simple but useful technique to derive a solution to a problem by randomly guessing possible &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://bensblog.com/blog/2009/09/17/apple-push-notifications-toolkit-for-ruby">
+  <link rel="canonical" href="http://bensblog.com/blog/2014/03/29/a-simple-monte-carlo-experiment-in-r-more-pi">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Ben Poweski" type="application/atom+xml">
@@ -78,7 +78,7 @@
   
   <header>
     
-      <h1 class="entry-title">Apple Push Notifications Toolkit for Ruby</h1>
+      <h1 class="entry-title">A Simple Monte Carlo Experiment in R: More Pi</h1>
     
     
       <p class="meta">
@@ -94,57 +94,60 @@
   
 
 
-<time datetime="2009-09-17T16:45:00-05:00" pubdate data-updated="true">Sep 17<span>th</span>, 2009</time>
+<time datetime="2014-03-29T17:03:00-05:00" pubdate data-updated="true">Mar 29<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>Lately I&#8217;ve been working on an iPhone application that utilizes Push Notifications extensively.  While Apple provides great documentation there is still a fair amount of work left up to the developer to send push notification in ordinance to their usage policy.</p>
-<p>Since I&#8217;m using Rails for the backend I needed a way to maintain a single open <span class="caps">SSL</span> connection to prevent setup and tear down for every notification sent.  To accomplish this I created an <a href="http://rubyeventmachine.com/">Event Machine</a> based server deamon that that proxies all requests send by Rails application over a local, non <span class="caps">SSL</span> socket.</p>
-<p>The proxy queues and sends each notification to the Apple notification servers.  Additionally I&#8217;ve created a command line script to send notifications for testing purposes.  My project <a href="http://github.com/bpoweski/apnserver/">Apn Server</a> is hosted on <a href="http://www.github.com/">Github</a>.</p>
-<p>You can add it to your Rails application via</p>
-<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>config.gem "bpoweski-apnserver", :lib => 'apnserver', 
-</span><span class='line'>  :source => "http://gems.github.com"</span></code></pre></td></tr></table></div></figure></div></notextile></p>
-<p>You can use either a direct connection to Apple or one through the apnserverd proxy included in the gem.  To configure directly to Apple&#8217;s server (and also setting up and tearing down a new connection each time).  Add the following to your environment.rb.</p>
-<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>ApnServer::Config.pem = '/path/to/pem'
-</span><span class='line'>  ApnServer::Config.host = 'gateway.push.apple.com'
-</span><span class='line'>  ApnServer::Config.port = 2195</span></code></pre></td></tr></table></div></figure></div></notextile></p>
-<p>To use the non <span class="caps">SSL</span> apnserverd proxy simply drop the <span class="caps">PEM</span> configuration option</p>
-<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>ApnServer::Config.host = 'localhost'
-</span><span class='line'>  ApnServer::Config.port = 22195</span></code></pre></td></tr></table></div></figure></div></notextile></p>
-<p>To send a notification from Ruby</p>
+<div class="entry-content"><p>Monte Carlo simulations (or Monte Carlo methods) are a simple but useful technique to derive a solution to a problem by randomly guessing possible inputs.  The definition is so broad that it&#8217;s likely you&#8217;ve used this technique without even realizing it.</p>
+<p>The hello world problem for Monte Carlo applications is undoubtedly calculating approximations of Pi, albeit ineffeciently.</p>
+<h3>It&#8217;s Always About Darts</h3>
+<p>Before we can write software to do this we need to think about how to restate the question in probablistic terms.  A way to model this problem is to think about Pi as the probability of hitting 1/4 of a perfectly circular dartboard inside of a square.</p>
 <p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>notification = ApnServer::Notification.new
-</span><span class='line'>  notification.device_token = Base64.decode64(apns_token)
-</span><span class='line'>  notification.alert = message
-</span><span class='line'>  notification.badge = 1
-</span><span class='line'>  notification.sound = 'default'
-</span><span class='line'>  notification.push</span></code></pre></td></tr></table></div></figure></div></notextile></p>
-<p>You can also send notifications via the line with</p>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>library("ggplot2")
+</span><span class='line'>
+</span><span class='line'>set.seed(13)
+</span><span class='line'>
+</span><span class='line'>make.pi &lt;- function(n) {
+</span><span class='line'>    darts &lt;- data.frame(x=runif(n), y=runif(n))
+</span><span class='line'>    darts$hit &lt;- (darts$x^2 + darts$y^2) &lt;= 1
+</span><span class='line'>    darts
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>calc.pi &lt;- function(df) {
+</span><span class='line'>    4*sum(df$hit)/nrow(df)
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure></div></notextile></p>
+<p>Here we have the make.pi function that creates an R data.frame that holds the trials containing the X &amp; Y coordinates of the dart position.</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sim &lt;- make.pi(10000)
+</span><span class='line'>ggplot(sim, aes(x, y, color=hit)) + geom_point() + ggtitle(calc.pi(sim))</span></code></pre></td></tr></table></div></figure></div></notextile></p>
+<p>This plot gives us a visualization of where each trial lands.</p>
+<p><img src="/images/quarter_circle.png"></p>
 <p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ apnsend --server gateway.push.apple.com --port 2195 \
-</span><span class='line'>     --pem key.pem \
-</span><span class='line'>     --b64-token j92f12jh8lqcAwcOVeSIrsBxibaJ0xyCi8/AkmzNlk8= \
-</span><span class='line'>     --sound default \
-</span><span class='line'>     --alert Hello</span></code></pre></td></tr></table></div></figure></div></notextile></p></div>
+</pre></td><td class='code'><pre><code class=''><span class='line'>attempts &lt;- seq(1000, 1000000, by=10000)
+</span><span class='line'>estimated &lt;- sapply(attempts, function(x) calc.pi(make.pi(x)))
+</span><span class='line'>
+</span><span class='line'>ggplot(data.frame(estimated=estimated, n=attempts)) + geom_line(aes(x=n, y=estimated)) + geom_hline(yintercept=pi, color="green")</span></code></pre></td></tr></table></div></figure></div></notextile></p>
+<p>And finally we can check how well this solution scales with different size trials.</p>
+<p><img src="/images/error.png"></p></div>
 
 
   <footer>
@@ -166,21 +169,15 @@
   
 
 
-<time datetime="2009-09-17T16:45:00-05:00" pubdate data-updated="true">Sep 17<span>th</span>, 2009</time>
+<time datetime="2014-03-29T17:03:00-05:00" pubdate data-updated="true">Mar 29<span>th</span>, 2014</time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/ruby/'>ruby</a>
-  
-</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bensblog.com/blog/2009/09/17/apple-push-notifications-toolkit-for-ruby/" data-via="bpoweski" data-counturl="http://bensblog.com/blog/2009/09/17/apple-push-notifications-toolkit-for-ruby/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bensblog.com/blog/2014/03/29/a-simple-monte-carlo-experiment-in-r-more-pi/" data-via="bpoweski" data-counturl="http://bensblog.com/blog/2014/03/29/a-simple-monte-carlo-experiment-in-r-more-pi/" >Tweet</a>
   
   
   
@@ -189,10 +186,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2008/12/27/remove-bevel-and-gloss-effect-from-iphone-icon/" title="Previous Post: Remove Bevel and Gloss Effect From iPhone Icon">&laquo; Remove Bevel and Gloss Effect From iPhone Icon</a>
+        <a class="basic-alignment left" href="/blog/2013/06/15/using-new-relic-with-clojure/" title="Previous Post: Using New Relic with Clojure">&laquo; Using New Relic with Clojure</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2013/06/15/using-new-relic-with-clojure/" title="Next Post: Using New Relic with Clojure">Using New Relic with Clojure &raquo;</a>
       
     </p>
   </footer>
@@ -287,8 +282,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://bensblog.com/blog/2009/09/17/apple-push-notifications-toolkit-for-ruby/';
-        var disqus_url = 'http://bensblog.com/blog/2009/09/17/apple-push-notifications-toolkit-for-ruby/';
+        var disqus_identifier = 'http://bensblog.com/blog/2014/03/29/a-simple-monte-carlo-experiment-in-r-more-pi/';
+        var disqus_url = 'http://bensblog.com/blog/2014/03/29/a-simple-monte-carlo-experiment-in-r-more-pi/';
         var disqus_script = 'embed.js';
       
     (function () {

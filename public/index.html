@@ -9,7 +9,7 @@
   <meta name="author" content="Ben Poweski">
 
   
-  <meta name="description" content="At getaroom.com we&#8217;ve used New Relic extensively for many years to monitor our Rails applications. We&#8217;ve recently began moving our &hellip;">
+  <meta name="description" content="Monte Carlo simulations (or Monte Carlo methods) are a simple but useful technique to derive a solution to a problem by randomly guessing possible &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -50,8 +50,6 @@
   <header role="banner"><hgroup>
   <h1><a href="/">Ben Poweski</a></h1>
   
-    <h2>Random ramblings</h2>
-  
 </hgroup>
 
 </header>
@@ -77,6 +75,87 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/29/a-simple-monte-carlo-experiment-in-r-more-pi/">A Simple Monte Carlo Experiment in R: More Pi</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-29T17:03:00-05:00" pubdate data-updated="true">Mar 29<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Monte Carlo simulations (or Monte Carlo methods) are a simple but useful technique to derive a solution to a problem by randomly guessing possible inputs.  The definition is so broad that it&#8217;s likely you&#8217;ve used this technique without even realizing it.</p>
+<p>The hello world problem for Monte Carlo applications is undoubtedly calculating approximations of Pi, albeit ineffeciently.</p>
+<h3>It&#8217;s Always About Darts</h3>
+<p>Before we can write software to do this we need to think about how to restate the question in probablistic terms.  A way to model this problem is to think about Pi as the probability of hitting 1/4 of a perfectly circular dartboard inside of a square.</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>library("ggplot2")
+</span><span class='line'>
+</span><span class='line'>set.seed(13)
+</span><span class='line'>
+</span><span class='line'>make.pi &lt;- function(n) {
+</span><span class='line'>    darts &lt;- data.frame(x=runif(n), y=runif(n))
+</span><span class='line'>    darts$hit &lt;- (darts$x^2 + darts$y^2) &lt;= 1
+</span><span class='line'>    darts
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>calc.pi &lt;- function(df) {
+</span><span class='line'>    4*sum(df$hit)/nrow(df)
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure></div></notextile></p>
+<p>Here we have the make.pi function that creates an R data.frame that holds the trials containing the X &amp; Y coordinates of the dart position.</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sim &lt;- make.pi(10000)
+</span><span class='line'>ggplot(sim, aes(x, y, color=hit)) + geom_point() + ggtitle(calc.pi(sim))</span></code></pre></td></tr></table></div></figure></div></notextile></p>
+<p>This plot gives us a visualization of where each trial lands.</p>
+<p><img src="/images/quarter_circle.png"></p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>attempts &lt;- seq(1000, 1000000, by=10000)
+</span><span class='line'>estimated &lt;- sapply(attempts, function(x) calc.pi(make.pi(x)))
+</span><span class='line'>
+</span><span class='line'>ggplot(data.frame(estimated=estimated, n=attempts)) + geom_line(aes(x=n, y=estimated)) + geom_hline(yintercept=pi, color="green")</span></code></pre></td></tr></table></div></figure></div></notextile></p>
+<p>And finally we can check how well this solution scales with different size trials.</p>
+<p><img src="/images/error.png"></p></div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1029,6 +1108,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/03/29/a-simple-monte-carlo-experiment-in-r-more-pi/">A Simple Monte Carlo Experiment in R: More Pi</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/06/15/using-new-relic-with-clojure/">Using New Relic with Clojure</a>
       </li>
     
@@ -1042,10 +1125,6 @@
     
       <li class="post">
         <a href="/blog/2008/05/23/parsing-css-with-antlr/">Parsing CSS with ANTLR</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2008/04/28/securing-data-wtih-openssl-and-ruby/">Securing Data wtih OpenSSL and Ruby: Part One</a>
       </li>
     
   </ul>
