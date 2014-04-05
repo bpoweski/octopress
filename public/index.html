@@ -29,6 +29,10 @@
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<!--- MathJax Configuration -->
+<script type="text/javascript"
+src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML,http://drz.ac/javascripts/MathJaxLocal.js">
+</script>
 
   
   <script>
@@ -104,9 +108,40 @@
 
 
   <div class="entry-content"><p>Monte Carlo simulations (or Monte Carlo methods) are a simple but useful technique to derive a solution to a problem by randomly guessing possible inputs.  The definition is so broad that it&#8217;s likely you&#8217;ve used this technique without even realizing it.</p>
-<p>The hello world problem for Monte Carlo applications is undoubtedly calculating approximations of Pi, albeit ineffeciently.</p>
+<p>The hello world problem for Monte Carlo applications is undoubtedly calculating approximations of &piv;, albeit ineffeciently.</p>
 <h3>It&#8217;s Always About Darts</h3>
-<p>Before we can write software to do this we need to think about how to restate the question in probablistic terms.  A way to model this problem is to think about Pi as the probability of hitting 1/4 of a perfectly circular dartboard inside of a square.</p>
+<p>Before we can write software to do this we need to think about how to restate the question in probablistic terms.  &piv; is simply the ratio of a circle&#8217;s circumference to its diamater.</p>
+<blockquote>
+<p><script type="math/tex">\pi = \frac{C}{d}</script></p>
+</blockquote>
+<p>We also know the area of circle is:</p>
+<blockquote>
+<p><script type="math/tex">A_c = \pi r^2</script></p>
+</blockquote>
+<p>Suppose a circle was inscribed inside of a square.</p>
+<p><img src="/images/circle_in_square.png"></p>
+<p>We could then define the area of the square in terms of the circle&#8217;s diameter:</p>
+<blockquote>
+<p><script type="math/tex">A_s = lw = dd = d^2</script></p>
+</blockquote>
+<p>Or in terms of the circles radius:</p>
+<blockquote>
+<p><script type="math/tex">A_s = (2r)^2 = 4r^2</script></p>
+</blockquote>
+<p>Now, onto the darts.  Imagine you&#8217;re throwing darts at the square.  The universe is constrainted such that every dart lands randomly inside of the square.</p>
+<p>The probability of a dart hitting the circle is the radio of the area of the circle over the square.</p>
+<blockquote>
+<p><script type="math/tex">\frac{A_c}{A_s} = \frac{\pi r^2}{4r^2}</script></p>
+</blockquote>
+<p>Which means:</p>
+<blockquote>
+<p><script type="math/tex">\pi = 4\frac{A_c}{A_s}</script></p>
+</blockquote>
+<p>Restated another way:</p>
+<blockquote>
+<p><script type="math/tex">\frac{\pi}{4} = \frac{A_c}{A_s}</script></p>
+</blockquote>
+<p>Now that we know a fourth of &piv;, we can limit our trial to one quadrant because the ratio still holds true.  This isn&#8217;t strictly nessecary but it simplies the program.</p>
 <p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -133,7 +168,7 @@
 </span><span class='line'>calc.pi &lt;- function(df) {
 </span><span class='line'>    4*sum(df$hit)/nrow(df)
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure></div></notextile></p>
-<p>Here we have the make.pi function that creates an R data.frame that holds the trials containing the X &amp; Y coordinates of the dart position.</p>
+<p>Here we have the <code>make.pi</code> function that creates an R <code>data.frame</code> that holds the trials containing the X &amp; Y coordinates of the dart position.</p>
 <p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>sim &lt;- make.pi(10000)
