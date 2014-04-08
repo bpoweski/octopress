@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "A Simple Monte Carlo Experiment in R: More Pi"
+title: "A Simple Monte Carlo Experiment in R: More &#120587;"
 date: 2014-03-29 17:03
 comments: true
 categories:
@@ -8,11 +8,11 @@ categories:
 
 Monte Carlo simulations (or Monte Carlo methods) are a simple but useful technique to derive a solution to a problem by randomly guessing possible inputs.  The definition is so broad that it's likely you've used this technique without even realizing it.
 
-The hello world problem for Monte Carlo applications is undoubtedly calculating approximations of &piv;, albeit ineffeciently.
+The hello world problem for Monte Carlo applications is undoubtedly calculating approximations of &#120587;, albeit ineffeciently.
 
 h3. It's Always About Darts
 
-Before we can write software to do this we need to think about how to restate the question in probablistic terms.  &piv; is simply the ratio of a circle's circumference to its diamater.
+Before we can write software to do this we need to think about how to restate the question in probablistic terms.  &#120587; is simply the ratio of a circle's circumference to its diamater.
 
 bq. <script type="math/tex">\pi = \frac{C}{d}</script>
 
@@ -22,7 +22,7 @@ bq. <script type="math/tex">A_c = \pi r^2</script>
 
 Suppose a circle was inscribed inside of a square.
 
-{% img /images/circle_in_square.png %}
+{% img /images/circle_in_square.png 2100 2100px %}
 
 We could then define the area of the square in terms of the circle's diameter:
 
@@ -46,7 +46,7 @@ Restated another way:
 
 bq.  <script type="math/tex">\frac{\pi}{4} = \frac{A_c}{A_s}</script>
 
-Now that we know a fourth of &piv;, we can limit our trial to one quadrant because the ratio still holds true.  This isn't strictly nessecary but it simplies the program.
+Now that we know a fourth of &#120587;, we can limit our trial to one quadrant because the ratio still holds true.  This isn't strictly nessecary but it simplies the program.
 
 {% codeblock %}
 library("ggplot2")
@@ -76,10 +76,10 @@ This plot gives us a visualization of where each trial lands.
 {% img /images/quarter_circle.png %}
 
 {% codeblock %}
-attempts <- seq(1000, 1000000, by=10000)
-estimated <- sapply(attempts, function(x) calc.pi(make.pi(x)))
+attempts <- seq(1, 100000, by=50)
+estimated <- sapply(attempts, function(x) abs(calc.pi(make.pi(x)) - pi)/pi)
 
-ggplot(data.frame(estimated=estimated, n=attempts)) + geom_line(aes(x=n, y=estimated)) + geom_hline(yintercept=pi, color="green")
+ggplot(data.frame(estimated=estimated, n=attempts)) + geom_line(aes(x=n, y=estimated)) + ylab("error %")
 {% endcodeblock %}
 
 And finally we can check how well this solution scales with different size trials.
