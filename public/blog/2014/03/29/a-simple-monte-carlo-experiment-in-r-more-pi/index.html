@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>A Simple Monte Carlo Experiment in R: More Pi - Ben Poweski</title>
+  <title>A Simple Monte Carlo Experiment in R: More &#120587; - Ben Poweski</title>
   <meta name="author" content="Ben Poweski">
 
   
@@ -81,7 +81,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   
   <header>
     
-      <h1 class="entry-title">A Simple Monte Carlo Experiment in R: More Pi</h1>
+      <h1 class="entry-title">A Simple Monte Carlo Experiment in R: More &#120587;</h1>
     
     
       <p class="meta">
@@ -105,9 +105,9 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 
 <div class="entry-content"><p>Monte Carlo simulations (or Monte Carlo methods) are a simple but useful technique to derive a solution to a problem by randomly guessing possible inputs.  The definition is so broad that it&#8217;s likely you&#8217;ve used this technique without even realizing it.</p>
-<p>The hello world problem for Monte Carlo applications is undoubtedly calculating approximations of &piv;, albeit ineffeciently.</p>
+<p>The hello world problem for Monte Carlo applications is undoubtedly calculating approximations of &#120587;, albeit ineffeciently.</p>
 <h3>It&#8217;s Always About Darts</h3>
-<p>Before we can write software to do this we need to think about how to restate the question in probablistic terms.  &piv; is simply the ratio of a circle&#8217;s circumference to its diamater.</p>
+<p>Before we can write software to do this we need to think about how to restate the question in probablistic terms.  &#120587; is simply the ratio of a circle&#8217;s circumference to its diamater.</p>
 <blockquote>
 <p><script type="math/tex">\pi = \frac{C}{d}</script></p>
 </blockquote>
@@ -116,7 +116,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 <p><script type="math/tex">A_c = \pi r^2</script></p>
 </blockquote>
 <p>Suppose a circle was inscribed inside of a square.</p>
-<p><img src="/images/circle_in_square.png"></p>
+<p><img src="/images/circle_in_square.png" width="2100" height="2100"></p>
 <p>We could then define the area of the square in terms of the circle&#8217;s diameter:</p>
 <blockquote>
 <p><script type="math/tex">A_s = lw = dd = d^2</script></p>
@@ -138,7 +138,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 <blockquote>
 <p><script type="math/tex">\frac{\pi}{4} = \frac{A_c}{A_s}</script></p>
 </blockquote>
-<p>Now that we know a fourth of &piv;, we can limit our trial to one quadrant because the ratio still holds true.  This isn&#8217;t strictly nessecary but it simplies the program.</p>
+<p>Now that we know a fourth of &#120587;, we can limit our trial to one quadrant because the ratio still holds true.  This isn&#8217;t strictly nessecary but it simplies the program.</p>
 <p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -176,10 +176,10 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>attempts &lt;- seq(1000, 1000000, by=10000)
-</span><span class='line'>estimated &lt;- sapply(attempts, function(x) calc.pi(make.pi(x)))
+</pre></td><td class='code'><pre><code class=''><span class='line'>attempts &lt;- seq(1, 100000, by=50)
+</span><span class='line'>estimated &lt;- sapply(attempts, function(x) abs(calc.pi(make.pi(x)) - pi)/pi)
 </span><span class='line'>
-</span><span class='line'>ggplot(data.frame(estimated=estimated, n=attempts)) + geom_line(aes(x=n, y=estimated)) + geom_hline(yintercept=pi, color="green")</span></code></pre></td></tr></table></div></figure></div></notextile></p>
+</span><span class='line'>ggplot(data.frame(estimated=estimated, n=attempts)) + geom_line(aes(x=n, y=estimated)) + ylab("error %")</span></code></pre></td></tr></table></div></figure></div></notextile></p>
 <p>And finally we can check how well this solution scales with different size trials.</p>
 <p><img src="/images/error.png"></p></div>
 
@@ -242,7 +242,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/03/29/a-simple-monte-carlo-experiment-in-r-more-pi/">A Simple Monte Carlo Experiment in R: More Pi</a>
+        <a href="/blog/2014/03/29/a-simple-monte-carlo-experiment-in-r-more-pi/">A Simple Monte Carlo Experiment in R: More &#120587;</a>
       </li>
     
       <li class="post">
