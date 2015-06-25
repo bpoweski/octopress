@@ -84,5 +84,6 @@ ggplot(data.frame(estimated=estimated, n=attempts)) + geom_line(aes(x=n, y=estim
 
 And finally we can check how well this solution scales with different size trials.
 
+
 {% img /images/error.png %}
 
